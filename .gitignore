@@ -1,0 +1,33 @@
+# Build artifacts
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Secrets / configs
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.json
+secrets.json
+
+# Entity Framework
+Migrations/
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Rider/JetBrains
+.idea/
+
