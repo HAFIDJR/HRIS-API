@@ -5,7 +5,7 @@ namespace HRIS.models
         public int UserID { get; set; }
         public required string Email { get; set; }
         public required string PasswordHash { get; set; }
-        public string? Role { get; set; }
+        public required string Role { get; set; }
         public int? EmployeeID { get; set; }
     }
 }

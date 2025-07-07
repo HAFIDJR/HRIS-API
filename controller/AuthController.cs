@@ -1,9 +1,10 @@
 using HRIS.data;
 using HRIS.models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+using HRIS.JWT;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace HRIS.Controller
 {
@@ -13,13 +14,12 @@ namespace HRIS.Controller
     {
 
         private readonly DataContextEF _db;
-
-        private readonly IConfiguration _config;
-
+        private readonly GenerateJwt _helperJwt;
         public AuthController(DataContextEF db, IConfiguration config)
         {
             _db = db;
-            _config = config;
+            _helperJwt = new GenerateJwt(config);
+
         }
 
         [HttpPost("register")]
@@ -46,6 +46,35 @@ namespace HRIS.Controller
             return Ok("Register Berhasil");
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginDto dto)
+        {
+            User? user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
 
+            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            {
+                return Unauthorized("Email atau password salah");
+            }
+
+            string token = _helperJwt.GenerateToken(user);
+            return Ok(new { token });
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult GetCurrentUser()
+        {
+            string? email = User.FindFirstValue(ClaimTypes.Email);
+            string? role = User.FindFirstValue(ClaimTypes.Role);
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            return Ok(new
+            {
+                Email = email,
+                Role = role,
+                UserID = userId
+            });
+
+        }
     }
 }
