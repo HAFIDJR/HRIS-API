@@ -19,7 +19,6 @@ namespace HRIS.Controller
         {
             _db = db;
             _helperJwt = new GenerateJwt(config);
-
         }
 
         [HttpPost("register")]
@@ -51,13 +50,40 @@ namespace HRIS.Controller
         {
             User? user = await _db.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            if (user == null)
             {
-                return Unauthorized("Email atau password salah");
+                return NotFound(new
+                {
+                    status = false,
+                    statusCode = 404,
+                    message = "Email tidak terdaftar"
+                });
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            {
+                return StatusCode(405, new
+                {
+                    status = false,
+                    statusCode = 405,
+                    message = "Password salah"
+                });
             }
 
             string token = _helperJwt.GenerateToken(user);
-            return Ok(new { token });
+            return Ok(new
+            {
+                status = true,
+                statusCode = 200,
+                message = "Login berhasil",
+                token,
+                user = new
+                {
+                    user.Email,
+                    user.Role,
+                    user.UserID
+                }
+            });
         }
 
         [Authorize]

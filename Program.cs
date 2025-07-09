@@ -94,6 +94,7 @@ app.MapGet("/", () =>
 })
 .WithName("home");
 
+app.UseMiddleware<CustomAuthMiddleware>();
 
 app.UseAuthentication();
 
