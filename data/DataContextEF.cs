@@ -1,4 +1,5 @@
 using HRIS.models;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
 namespace HRIS.data
@@ -13,6 +14,7 @@ namespace HRIS.data
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Job> Job { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -33,6 +35,14 @@ namespace HRIS.data
 
             modelBuilder.Entity<User>()
                 .HasKey(u => u.UserID);
+
+            modelBuilder.Entity<Job>()
+                .HasKey(u => u.JobID);
+
+            modelBuilder.Entity<Job>()
+                .HasMany(j => j.Employees)
+                .WithOne(e => e.Job)
+                .HasForeignKey(e => e.JobID);
         }
     }
 }
