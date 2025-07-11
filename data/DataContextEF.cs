@@ -1,3 +1,4 @@
+using HRIS.Configuration;
 using HRIS.models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ namespace HRIS.data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Job> Job { get; set; }
+        public DbSet<Department> Department { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -43,6 +45,8 @@ namespace HRIS.data
                 .HasMany(j => j.Employees)
                 .WithOne(e => e.Job)
                 .HasForeignKey(e => e.JobID);
+
+            modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
         }
     }
 }
